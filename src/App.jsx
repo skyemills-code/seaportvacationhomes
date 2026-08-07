@@ -8,6 +8,7 @@ import RightColumn from './components/RightColumn'
 import CompareMode from './components/CompareMode'
 import PlayerFormModal from './components/PlayerFormModal'
 import DataModal from './components/DataModal'
+import AIEvaluateModal from './components/AIEvaluateModal'
 import { OnTheClockMode, LateRoundMode } from './components/FocusModes'
 
 export default function App() {
@@ -19,11 +20,18 @@ export default function App() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [formModal, setFormModal] = useState(null) // { mode, initial } | null
   const [dataOpen, setDataOpen] = useState(false)
+  const [aiEval, setAiEval] = useState(null) // { name, existing } | null
   const searchRef = useRef(null)
 
   const onSelect = useCallback((id) => setSelectedId(id), [])
   const openAdd = useCallback((name) => setFormModal({ mode: 'add', initial: name ? { name } : null }), [])
   const openEdit = useCallback((player) => setFormModal({ mode: 'edit', initial: player }), [])
+  const openAiEval = useCallback((name, existing = null) => setAiEval({ name, existing }), [])
+  // From the AI modal: open the form pre-filled with the AI's record to tweak first.
+  const editAiRecord = useCallback((record, existing) => {
+    if (existing) setFormModal({ mode: 'edit', initial: { ...existing, ...record, id: existing.id } })
+    else setFormModal({ mode: 'add', initial: record })
+  }, [])
 
   // Close the compare modal automatically once fewer than 2 remain selected.
   useEffect(() => {
@@ -39,7 +47,8 @@ export default function App() {
         searchRef.current?.focus()
         searchRef.current?.select()
       } else if (e.key === 'Escape') {
-        if (formModal) setFormModal(null)
+        if (aiEval) setAiEval(null)
+        else if (formModal) setFormModal(null)
         else if (dataOpen) setDataOpen(false)
         else if (mode !== 'none') setMode('none')
         else if (compareOpen) setCompareOpen(false)
@@ -51,7 +60,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [mode, compareOpen, query, formModal, dataOpen])
+  }, [mode, compareOpen, query, formModal, dataOpen, aiEval])
 
   // Loading / empty / error states.
   if (!state.loaded) {
@@ -110,6 +119,7 @@ export default function App() {
             onSelect={onSelect}
             onAddPlayer={openAdd}
             onEdit={openEdit}
+            onAiEval={openAiEval}
           />
         </div>
       </div>
@@ -143,6 +153,14 @@ export default function App() {
         <PlayerFormModal mode={formModal.mode} initial={formModal.initial} onClose={() => setFormModal(null)} />
       )}
       {dataOpen && <DataModal onClose={() => setDataOpen(false)} />}
+      {aiEval && (
+        <AIEvaluateModal
+          name={aiEval.name}
+          existing={aiEval.existing}
+          onClose={() => setAiEval(null)}
+          onEditRecord={editAiRecord}
+        />
+      )}
     </div>
   )
 }

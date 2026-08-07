@@ -28,3 +28,24 @@ export function clearState() {
     /* ignore */
   }
 }
+
+// The AI API key is stored separately so it is NEVER included in an exported
+// board or shared with anyone — it lives only in this browser.
+const KEY_API = 'juice-board:apikey:v1'
+
+export function loadApiKey() {
+  try {
+    return localStorage.getItem(KEY_API) || ''
+  } catch {
+    return ''
+  }
+}
+
+export function saveApiKey(key) {
+  try {
+    if (key) localStorage.setItem(KEY_API, key)
+    else localStorage.removeItem(KEY_API)
+  } catch {
+    /* ignore */
+  }
+}

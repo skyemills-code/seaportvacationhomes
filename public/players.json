@@ -347,8 +347,8 @@
   {
     "name": "Kenneth Walker III",
     "position": "RB",
-    "team": "KC",
-    "bye": 5,
+    "team": "SEA",
+    "bye": 11,
     "draftWindow": "R3–4",
     "role": "Starter",
     "juice": 80,
@@ -527,8 +527,8 @@
   {
     "name": "Mike Evans",
     "position": "WR",
-    "team": "SF",
-    "bye": 8,
+    "team": "TB",
+    "bye": 10,
     "draftWindow": "R4–6",
     "role": "Starter",
     "juice": 73,
@@ -1172,8 +1172,8 @@
   {
     "name": "Tyler Allgeier",
     "position": "RB",
-    "team": "ARI",
-    "bye": 14,
+    "team": "ATL",
+    "bye": 11,
     "draftWindow": "R10–14",
     "role": "Handcuff",
     "juice": 55,

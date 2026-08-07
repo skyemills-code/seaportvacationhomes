@@ -141,6 +141,22 @@ never have to edit JSON or redeploy mid-season.
 `points2025` accepts a real number (e.g. `164.2`), a label like `Rookie`, or
 blank (shows `—`). All of this is stored in `localStorage`.
 
+## 🤖 AI evaluation (optional, online)
+
+The board never computes JUICE itself — but you can have Claude propose a full
+record for a player on demand. Search a name that isn't on the board →
+**🤖 Evaluate with AI**, or hit **🤖 Re-evaluate & fix with AI** on any player
+card (this also corrects wrong team/bye/position).
+
+- It uses **your own Anthropic API key**, pasted once and stored **only in this
+  browser** — it is never uploaded and never included in an Export. Get a key at
+  console.anthropic.com → API Keys.
+- Claude returns a JUICE score, role, draft window, trend, and a one-line why,
+  scored on usage / upside / risk / environment. It will **not** invent 2025
+  point totals (rookies show `Rookie`, unknowns stay blank).
+- Review the result, then **Add to Board** / **Apply Changes**, or **Edit
+  first**. This needs internet, so it's for prep — not draft day.
+
 ## Online now, offline on draft day
 
 It's one app — the same site runs hosted (online) and locally (offline). The

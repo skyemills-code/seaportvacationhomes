@@ -2,7 +2,7 @@ import { useDraft } from '../context/DraftContext'
 import { useActions } from '../lib/useActions'
 import { JuiceBadge, RoleBadge, TrendBadge, PosTag, WindowTag, StatusDot } from './badges'
 
-export default function PlayerCard({ player, onEdit }) {
+export default function PlayerCard({ player, onEdit, onAiEval }) {
   const { state } = useDraft()
   const actions = useActions()
   const inCompare = state.compareIds.includes(player.id)
@@ -95,6 +95,11 @@ export default function PlayerCard({ player, onEdit }) {
         >
           {inCompare ? '✓ In Compare' : '⚖ Add to Compare'}
         </button>
+        {onAiEval && (
+          <button className="btn-big ghost" onClick={() => onAiEval(player.name, player)}>
+            🤖 Re-evaluate & fix with AI
+          </button>
+        )}
       </div>
     </div>
   )

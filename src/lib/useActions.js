@@ -29,6 +29,7 @@ export function useActions() {
     importReplace: (list) => dispatch({ type: 'IMPORT_REPLACE', list }),
     importMerge: (list) => dispatch({ type: 'IMPORT_MERGE', list }),
     clearData: () => dispatch({ type: 'CLEAR_DATA' }),
+    setApiKey: (key) => dispatch({ type: 'SET_API_KEY', key }),
 
     // Build the current board as an array in the on-disk schema.
     exportBoard: () => enrichPlayers(state).map(denormalizePlayer),

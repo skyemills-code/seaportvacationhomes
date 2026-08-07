@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from 'react'
 import { normalizePlayer, normalizePlayers, slugify, uniqueId } from '../lib/data'
-import { loadState, saveState } from '../lib/storage'
+import { loadState, saveState, loadApiKey, saveApiKey } from '../lib/storage'
 
 const DraftContext = createContext(null)
 
@@ -33,6 +33,7 @@ const initialState = {
   teams: 12,
   theme: 'system',     // 'system' | 'light' | 'dark'
   compareIds: [],      // ephemeral: up to 3 ids for Compare mode
+  apiKey: '',          // AI key — NOT persisted with the board; stored separately
 }
 
 // All ids currently in use, so new/imported players never collide.
@@ -202,6 +203,8 @@ function reducer(state, action) {
       }
       return { ...state, customPlayers: [...state.customPlayers, ...additions], edits }
     }
+    case 'SET_API_KEY':
+      return { ...state, apiKey: action.key }
     case 'CLEAR_DATA':
       // Reset imported/custom players and all edits back to the baked-in file.
       return {
@@ -222,7 +225,8 @@ export function DraftProvider({ children }) {
   // Hydrate persisted slices synchronously so there's no flash of empty state.
   const [state, dispatch] = useReducer(reducer, initialState, (init) => {
     const saved = loadState()
-    return saved ? { ...init, ...pick(saved, PERSIST_KEYS) } : init
+    const hydrated = saved ? { ...init, ...pick(saved, PERSIST_KEYS) } : init
+    return { ...hydrated, apiKey: loadApiKey() }
   })
 
   // Load the player database (offline JSON) once.
@@ -244,6 +248,12 @@ export function DraftProvider({ children }) {
   useEffect(() => {
     saveState(pick(state, PERSIST_KEYS))
   }, PERSIST_KEYS.map((k) => state[k])) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist the AI key on its own — deliberately excluded from the board blob
+  // and from Export, so it never leaves this browser.
+  useEffect(() => {
+    saveApiKey(state.apiKey)
+  }, [state.apiKey])
 
   // Apply theme to <html data-theme>.
   useEffect(() => {

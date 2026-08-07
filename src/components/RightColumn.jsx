@@ -4,7 +4,7 @@ import { useActions } from '../lib/useActions'
 import { enrichPlayers, searchPlayers } from '../lib/board'
 import PlayerCard from './PlayerCard'
 
-export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, onEdit }) {
+export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, onEdit, onAiEval }) {
   const { state } = useDraft()
   const actions = useActions()
   const enriched = useMemo(() => enrichPlayers(state), [state])
@@ -43,9 +43,16 @@ export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, 
           <button
             className="btn-big primary"
             style={{ width: '100%' }}
+            onClick={() => onAiEval && onAiEval(trimmed)}
+          >
+            🤖 Evaluate “{trimmed}” with AI
+          </button>
+          <button
+            className="btn-big ghost"
+            style={{ width: '100%', gridColumn: 'auto', marginTop: 8 }}
             onClick={() => onAddPlayer && onAddPlayer(trimmed)}
           >
-            ➕ Add “{trimmed}” to Board
+            ➕ Add manually
           </button>
           {alreadyWatching ? (
             <div className="hint">✓ On your watch list</div>
@@ -76,7 +83,7 @@ export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, 
             </button>
           </div>
         )}
-        <PlayerCard player={searchResults.best} onEdit={onEdit} />
+        <PlayerCard player={searchResults.best} onEdit={onEdit} onAiEval={onAiEval} />
       </div>
     )
   }
@@ -85,7 +92,7 @@ export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, 
   if (selected) {
     return (
       <div className="panel panel-pad">
-        <PlayerCard player={selected} onEdit={onEdit} />
+        <PlayerCard player={selected} onEdit={onEdit} onAiEval={onAiEval} />
       </div>
     )
   }

@@ -1407,6 +1407,40 @@ input {
   }
 }
 
+/* ---- AI evaluate ------------------------------------------------------- */
+.key-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 14px;
+  margin-top: 10px;
+  font-size: 14px;
+  font-family: ui-monospace, monospace;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.key-input:focus {
+  outline: none;
+  border-color: var(--green);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 15%, transparent);
+}
+.spin {
+  display: inline-block;
+  animation: spin 1.1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
 /* ---- responsive --------------------------------------------------------- */
 @media (max-width: 1180px) {
   .layout {
