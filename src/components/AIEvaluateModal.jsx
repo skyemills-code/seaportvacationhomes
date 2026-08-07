@@ -98,7 +98,7 @@ export default function AIEvaluateModal({ name, existing, onClose, onEditRecord 
                 <div className="empty" style={{ height: 'auto', padding: '30px 10px' }}>
                   <div className="big spin">🧃</div>
                   <h3>Evaluating {name}…</h3>
-                  <p>Scoring usage, upside, risk & environment.</p>
+                  <p>Searching 2025 stats, then scoring on your system. Takes a few seconds.</p>
                 </div>
               )}
 

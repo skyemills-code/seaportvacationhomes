@@ -33,21 +33,29 @@ OFFENSE CAP RULE — offense is a modifier, never a dominator:
 
 Never let the offense modifier alone move an elite (raw 90+) player's score by more than 2 points.
 
-Return ONLY a raw JSON object (no markdown, no code fences, no prose) with EXACTLY these keys:
+RESEARCH — you have a web_search tool. Before scoring, search the web for:
+1. The player's CURRENT (2026 season) NFL team.
+2. Their ACTUAL 2025 full-PPR fantasy points total (regular season). Use a real, sourced number — do not guess.
+Prefer reputable fantasy stats sources. Keep it to a few searches.
+
+2026 BYE WEEKS — set "bye" from this table using the player's current team. DO NOT search for byes; use this list exactly:
+W5: KC, CAR · W6: MIA, CIN, DET, MIN · W7: BUF, LAC, WAS, JAX · W8: NYG, NO, SF, HOU · W9: TEN, PIT · W10: DEN, PHI, CHI, TB · W11: NE, CLE, SEA, GB, ATL, LAR · W13: IND, NYJ, LV, BAL · W14: DAL, ARI.
+
+After researching, return ONLY a raw JSON object (no markdown, no code fences, no other text) with EXACTLY these keys:
 - "name": string (correct, properly capitalized full name)
 - "position": one of "QB" "RB" "WR" "TE" "K"
-- "team": current NFL team abbreviation (e.g. "SEA"), or "TBD" if you are not confident
-- "bye": the team's bye week as a number, or "TBD" if unknown
+- "team": current NFL team abbreviation (e.g. "SEA"), from your search; "TBD" only if truly unsigned/unknown
+- "bye": the number from the 2026 BYE WEEKS table for the current team; "TBD" only if the team is unknown
 - "draftWindow": one of "R1" "R1-2" "R2-3" "R3-4" "R4-6" "R5-7" "R6-9" "R7-10" "R8-11" "R9-12" "R10-14" "Late" "Last" "Do not target"
 - "role": one of "Stud" "Starter" "League Winner" "Breakout" "Bench" "Handcuff" "Injury" "Watch"
 - "juice": integer 0-100
-- "points2025": if the player had no NFL production in the 2025 season (rookies, etc.), use "Rookie". Otherwise leave it as an empty string "" — do NOT invent or estimate a fantasy point total. Only put a number here if you are certain of the actual 2025 full-PPR total.
+- "points2025": the player's real 2025 full-PPR total as a whole number (from your web search). If the player had no 2025 NFL games (true rookie or did not play), use "Rookie". Use "" ONLY if you searched and genuinely could not find it.
 - "trend": one of "Rising" "Stable" "Falling"
 - "hearts": 0
 - "why": one short sentence (max ~8 words) — the core reason
-- "notes": START with the Scout Grade on one line in exactly this format: "Scout — Talent {n} / Opp {n} / Offense {+/-n} / Risk {+/-n} → {final juice}". Then add a short plain-language note; if you are uncertain about the team, role, health, or the 2025 total, say so here.
+- "notes": START with the Scout Grade on one line in exactly this format: "Scout — Talent {n} / Opp {n} / Offense {+/-n} / Risk {+/-n} → {final juice}". Then a short plain-language note; flag any uncertainty about team, role, health, or the 2025 number.
 
-Rules: never fabricate 2025 point totals. If the name is ambiguous or not a real NFL player, still return valid JSON with your best guess and flag the uncertainty in "notes". Output the JSON object and nothing else.`
+Rules: ground the 2025 total and current team in your web-search results — do not fabricate. If the name isn't a real NFL player, still return valid JSON with your best guess and flag it in "notes". Output the JSON object and nothing else.`
 
 function extractJson(text) {
   let t = String(text || '').trim()
@@ -83,17 +91,32 @@ export async function evaluatePlayer(apiKey, name, context = {}) {
       )
   }
 
-  const res = await client.messages.create({
-    model: MODEL,
-    max_tokens: 1400,
-    system: SYSTEM,
-    messages: [{ role: 'user', content: userText }],
-  })
+  // Web search lets the model pull the real 2025 stats + current team instead
+  // of guessing. It runs server-side; results come back in the response.
+  const tools = [{ type: 'web_search_20260209', name: 'web_search', max_uses: 5 }]
 
-  const text = (res.content || [])
-    .filter((b) => b.type === 'text')
-    .map((b) => b.text)
-    .join('')
+  const messages = [{ role: 'user', content: userText }]
+  let res
+  // The server runs a tool loop; if it pauses (pause_turn) we resume until done.
+  for (let i = 0; i < 4; i++) {
+    res = await client.messages.create({
+      model: MODEL,
+      max_tokens: 3000,
+      system: SYSTEM,
+      tools,
+      messages,
+    })
+    if (res.stop_reason === 'pause_turn') {
+      messages.push({ role: 'assistant', content: res.content })
+      continue
+    }
+    break
+  }
+
+  // Prefer the last text block that carries JSON (search narration may precede it).
+  const textBlocks = (res.content || []).filter((b) => b.type === 'text').map((b) => b.text)
+  const withBrace = textBlocks.filter((t) => t.includes('{'))
+  const text = (withBrace.length ? withBrace[withBrace.length - 1] : textBlocks.join('\n')) || ''
 
   const record = extractJson(text)
   // Force a clean name if the model echoed something odd.
