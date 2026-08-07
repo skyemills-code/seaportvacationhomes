@@ -4,7 +4,7 @@ import { useActions } from '../lib/useActions'
 import { enrichPlayers, searchPlayers } from '../lib/board'
 import PlayerCard from './PlayerCard'
 
-export default function RightColumn({ query, selectedId, onSelect }) {
+export default function RightColumn({ query, selectedId, onSelect, onAddPlayer, onEdit }) {
   const { state } = useDraft()
   const actions = useActions()
   const enriched = useMemo(() => enrichPlayers(state), [state])
@@ -38,17 +38,24 @@ export default function RightColumn({ query, selectedId, onSelect }) {
           <div className="empty">
             <div className="big">🚫</div>
             <div className="notfound banner">NOT ON THE JUICE BOARD</div>
-            <p>“{trimmed}” isn’t in your evaluations.</p>
+            <p>“{trimmed}” isn’t on your board yet.</p>
           </div>
+          <button
+            className="btn-big primary"
+            style={{ width: '100%' }}
+            onClick={() => onAddPlayer && onAddPlayer(trimmed)}
+          >
+            ➕ Add “{trimmed}” to Board
+          </button>
           {alreadyWatching ? (
             <div className="hint">✓ On your watch list</div>
           ) : (
             <button
-              className="btn-big primary"
-              style={{ width: '100%' }}
+              className="btn-big ghost"
+              style={{ width: '100%', gridColumn: 'auto', marginTop: 8 }}
               onClick={() => actions.addWatch(trimmed)}
             >
-              ＋ Add to Watch List
+              👀 Just add to Watch List
             </button>
           )}
         </div>
@@ -69,7 +76,7 @@ export default function RightColumn({ query, selectedId, onSelect }) {
             </button>
           </div>
         )}
-        <PlayerCard player={searchResults.best} />
+        <PlayerCard player={searchResults.best} onEdit={onEdit} />
       </div>
     )
   }
@@ -78,7 +85,7 @@ export default function RightColumn({ query, selectedId, onSelect }) {
   if (selected) {
     return (
       <div className="panel panel-pad">
-        <PlayerCard player={selected} />
+        <PlayerCard player={selected} onEdit={onEdit} />
       </div>
     )
   }

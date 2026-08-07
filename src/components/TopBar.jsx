@@ -4,7 +4,7 @@ import { useActions } from '../lib/useActions'
 const THEME_CYCLE = { system: 'light', light: 'dark', dark: 'system' }
 const THEME_ICON = { system: '🌓', light: '☀️', dark: '🌙' }
 
-export default function TopBar({ query, setQuery, searchRef, onClock, onLate, compareCount }) {
+export default function TopBar({ query, setQuery, searchRef, onClock, onLate, onAdd, onData }) {
   const { state } = useDraft()
   const actions = useActions()
 
@@ -41,6 +41,12 @@ export default function TopBar({ query, setQuery, searchRef, onClock, onLate, co
       </div>
 
       <div className="topbar-actions">
+        <button className="pill accent" onClick={onAdd} title="Add a player to the board">
+          ➕ <span className="hide-sm">Add</span>
+        </button>
+        <button className="pill" onClick={onData} title="Import / export player data">
+          🗂 <span className="hide-sm">Data</span>
+        </button>
         <button className="pill accent" onClick={onClock} title="On The Clock mode">
           ⏱ <span className="hide-sm">On The Clock</span>
         </button>

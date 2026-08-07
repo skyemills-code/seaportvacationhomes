@@ -2,7 +2,7 @@ import { useDraft } from '../context/DraftContext'
 import { useActions } from '../lib/useActions'
 import { JuiceBadge, RoleBadge, TrendBadge, PosTag, WindowTag, StatusDot } from './badges'
 
-export default function PlayerCard({ player }) {
+export default function PlayerCard({ player, onEdit }) {
   const { state } = useDraft()
   const actions = useActions()
   const inCompare = state.compareIds.includes(player.id)
@@ -11,6 +11,11 @@ export default function PlayerCard({ player }) {
     <div className="pcard">
       {/* hero */}
       <div className="pcard-hero">
+        {onEdit && (
+          <button className="card-edit" onClick={() => onEdit(player)} title="Edit player">
+            ✏️
+          </button>
+        )}
         <div className="pcard-name">{player.name}</div>
         <div className="pcard-meta">
           <PosTag position={player.position} />

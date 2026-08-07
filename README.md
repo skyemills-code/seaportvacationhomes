@@ -123,6 +123,39 @@ Each entry in the array looks like this:
 
 ---
 
+## Managing players (no rebuild needed)
+
+You can change the board live in the browser — nothing gets baked in, so you
+never have to edit JSON or redeploy mid-season.
+
+- **➕ Add** (top bar, or search a name that isn't on the board → *Add to
+  Board*) — enter the fields, **or** paste a JSON record and it fills the form.
+- **✏️ Edit** — the pencil on any player card opens the same form to update
+  JUICE, drop in 2025 points, change role, etc.
+- **🗂 Data → Export** — download your whole board as JSON (or copy it). Use
+  this to hand the board off for a JUICE/role refresh, or to load it into the
+  offline draft-day copy.
+- **🗂 Data → Import** — load a refreshed file. **Merge** adds new players and
+  updates matching ones; **Replace** swaps in the whole board.
+
+`points2025` accepts a real number (e.g. `164.2`), a label like `Rookie`, or
+blank (shows `—`). All of this is stored in `localStorage`.
+
+## Online now, offline on draft day
+
+It's one app — the same site runs hosted (online) and locally (offline). The
+only thing to carry between them is your data:
+
+1. Build the board online all season (Add / Edit / Import).
+2. Before draft day: **Data → Export** to download your final `players.json`.
+3. Run the app locally with no internet (`npm run dev`, or serve the built
+   `dist/`), open **Data → Import → Replace**, and load that file.
+
+Your draft picks, hearts, and notes live in the browser you're using, so do
+your drafting in the same place you loaded the data.
+
+---
+
 ## Tech
 
 React + Vite. No runtime dependencies beyond React. All state is local.

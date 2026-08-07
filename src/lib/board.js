@@ -1,11 +1,22 @@
 import { windowOrder } from './draftWindows'
+import { pointsValue } from './data'
 
-// Merge the static player evaluations with live draft state (status, hearts,
-// notes, and the pick/round at which they left the board).
+// The effective base list: an imported full board overrides the file, plus any
+// players you've added in-app. All offline, all persisted locally.
+export function allPlayers(state) {
+  const base = state.importedPlayers && state.importedPlayers.length ? state.importedPlayers : state.players
+  const custom = state.customPlayers || []
+  return [...base, ...custom]
+}
+
+// Merge the static player evaluations with live draft state (status, edits,
+// hearts, notes, and the pick/round at which they left the board).
 export function enrichPlayers(state) {
-  const { players, statuses, heartsOverride, notesOverride, events, teams } = state
+  const { statuses, heartsOverride, notesOverride, edits, events, teams } = state
   const eventIndex = new Map(events.map((id, i) => [id, i]))
-  return players.map((p) => {
+  return allPlayers(state).map((p0) => {
+    const edit = (edits && edits[p0.id]) || {}
+    const p = { ...p0, ...edit }
     const status = statuses[p.id] || 'available'
     const idx = eventIndex.has(p.id) ? eventIndex.get(p.id) : null
     return {
@@ -13,6 +24,7 @@ export function enrichPlayers(state) {
       status,
       hearts: heartsOverride[p.id] ?? p.hearts,
       notes: notesOverride[p.id] ?? p.notes,
+      isCustom: (state.customPlayers || []).some((c) => c.id === p.id),
       pick: idx === null ? null : idx + 1,
       round: idx === null ? null : Math.floor(idx / teams) + 1,
       pickInRound: idx === null ? null : (idx % teams) + 1,
@@ -79,10 +91,15 @@ export const SORTABLE = {
   name: (a, b) => a.name.localeCompare(b.name),
   position: (a, b) => a.position.localeCompare(b.position) || b.juice - a.juice,
   team: (a, b) => a.team.localeCompare(b.team) || b.juice - a.juice,
-  bye: (a, b) => (a.bye ?? 99) - (b.bye ?? 99) || b.juice - a.juice,
+  bye: (a, b) => (numOr(a.bye, 99) - numOr(b.bye, 99)) || b.juice - a.juice,
   draftWindow: (a, b) => windowOrder(a.draftWindow) - windowOrder(b.draftWindow) || b.juice - a.juice,
-  points2025: (a, b) => (b.points2025 ?? -1) - (a.points2025 ?? -1),
+  points2025: (a, b) => pointsValue(b.points2025) - pointsValue(a.points2025),
   role: (a, b) => a.role.localeCompare(b.role) || b.juice - a.juice,
+}
+
+function numOr(v, fallback) {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : fallback
 }
 
 export function sortPlayers(players, key, dir) {

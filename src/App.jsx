@@ -6,6 +6,8 @@ import LeftColumn from './components/LeftColumn'
 import CenterColumn from './components/CenterColumn'
 import RightColumn from './components/RightColumn'
 import CompareMode from './components/CompareMode'
+import PlayerFormModal from './components/PlayerFormModal'
+import DataModal from './components/DataModal'
 import { OnTheClockMode, LateRoundMode } from './components/FocusModes'
 
 export default function App() {
@@ -15,9 +17,13 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null)
   const [mode, setMode] = useState('none') // 'none' | 'clock' | 'late'
   const [compareOpen, setCompareOpen] = useState(false)
+  const [formModal, setFormModal] = useState(null) // { mode, initial } | null
+  const [dataOpen, setDataOpen] = useState(false)
   const searchRef = useRef(null)
 
   const onSelect = useCallback((id) => setSelectedId(id), [])
+  const openAdd = useCallback((name) => setFormModal({ mode: 'add', initial: name ? { name } : null }), [])
+  const openEdit = useCallback((player) => setFormModal({ mode: 'edit', initial: player }), [])
 
   // Close the compare modal automatically once fewer than 2 remain selected.
   useEffect(() => {
@@ -33,7 +39,9 @@ export default function App() {
         searchRef.current?.focus()
         searchRef.current?.select()
       } else if (e.key === 'Escape') {
-        if (mode !== 'none') setMode('none')
+        if (formModal) setFormModal(null)
+        else if (dataOpen) setDataOpen(false)
+        else if (mode !== 'none') setMode('none')
         else if (compareOpen) setCompareOpen(false)
         else if (query) {
           setQuery('')
@@ -43,7 +51,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [mode, compareOpen, query])
+  }, [mode, compareOpen, query, formModal, dataOpen])
 
   // Loading / empty / error states.
   if (!state.loaded) {
@@ -86,7 +94,8 @@ export default function App() {
         searchRef={searchRef}
         onClock={() => setMode('clock')}
         onLate={() => setMode('late')}
-        compareCount={compareCount}
+        onAdd={() => openAdd()}
+        onData={() => setDataOpen(true)}
       />
 
       <div className="layout">
@@ -95,7 +104,13 @@ export default function App() {
         </div>
         <CenterColumn query={query} selectedId={selectedId} onSelect={onSelect} />
         <div className="col col-right scroll">
-          <RightColumn query={query} selectedId={selectedId} onSelect={onSelect} />
+          <RightColumn
+            query={query}
+            selectedId={selectedId}
+            onSelect={onSelect}
+            onAddPlayer={openAdd}
+            onEdit={openEdit}
+          />
         </div>
       </div>
 
@@ -123,6 +138,11 @@ export default function App() {
 
       {mode === 'clock' && <OnTheClockMode onClose={() => setMode('none')} />}
       {mode === 'late' && <LateRoundMode onClose={() => setMode('none')} />}
+
+      {formModal && (
+        <PlayerFormModal mode={formModal.mode} initial={formModal.initial} onClose={() => setFormModal(null)} />
+      )}
+      {dataOpen && <DataModal onClose={() => setDataOpen(false)} />}
     </div>
   )
 }

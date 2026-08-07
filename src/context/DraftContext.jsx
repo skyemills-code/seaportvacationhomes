@@ -1,24 +1,47 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef } from 'react'
-import { normalizePlayers } from '../lib/data'
+import { normalizePlayer, normalizePlayers, slugify, uniqueId } from '../lib/data'
 import { loadState, saveState } from '../lib/storage'
 
 const DraftContext = createContext(null)
 
 // Which slices of state get persisted to localStorage.
-const PERSIST_KEYS = ['statuses', 'heartsOverride', 'notesOverride', 'events', 'watchList', 'teams', 'theme']
+const PERSIST_KEYS = [
+  'statuses',
+  'heartsOverride',
+  'notesOverride',
+  'edits',
+  'customPlayers',
+  'importedPlayers',
+  'events',
+  'watchList',
+  'teams',
+  'theme',
+]
 
 const initialState = {
-  players: [],
+  players: [],         // loaded from the file (baked-in base board)
   loaded: false,
   error: null,
   statuses: {},        // id -> 'available' | 'mine' | 'gone'
   heartsOverride: {},  // id -> number (user override of player.hearts)
   notesOverride: {},   // id -> string (user override of player.notes)
+  edits: {},           // id -> partial player fields (in-app edits)
+  customPlayers: [],   // players added in-app
+  importedPlayers: null, // a full imported board that overrides the file
   events: [],          // ordered list of player ids as they leave the board
   watchList: [],       // [{ name, ts }]
   teams: 12,
   theme: 'system',     // 'system' | 'light' | 'dark'
   compareIds: [],      // ephemeral: up to 3 ids for Compare mode
+}
+
+// All ids currently in use, so new/imported players never collide.
+function takenIds(state) {
+  const ids = new Set()
+  const base = state.importedPlayers && state.importedPlayers.length ? state.importedPlayers : state.players
+  for (const p of base) ids.add(p.id)
+  for (const p of state.customPlayers || []) ids.add(p.id)
+  return ids
 }
 
 function withEvent(events, id, status) {
@@ -95,6 +118,100 @@ function reducer(state, action) {
     }
     case 'REMOVE_WATCH':
       return { ...state, watchList: state.watchList.filter((w) => w.name !== action.name) }
+
+    case 'ADD_PLAYER': {
+      const player = normalizePlayer(action.record)
+      player.id = uniqueId(slugify(player.name) || 'player', takenIds(state))
+      // Adding a player also clears them off any watch list by the same name.
+      const watchList = state.watchList.filter(
+        (w) => w.name.toLowerCase() !== player.name.toLowerCase()
+      )
+      return { ...state, customPlayers: [...state.customPlayers, player], watchList }
+    }
+    case 'UPDATE_PLAYER': {
+      const clean = normalizePlayer({ id: action.id, ...action.fields })
+      // Keep only the fields the editor actually set (plus id passthrough).
+      const patch = {}
+      for (const k of Object.keys(action.fields)) patch[k] = clean[k]
+      // If it's a custom player, edit it in place; otherwise store an override.
+      if (state.customPlayers.some((c) => c.id === action.id)) {
+        const customPlayers = state.customPlayers.map((c) =>
+          c.id === action.id ? { ...c, ...patch } : c
+        )
+        return { ...state, customPlayers }
+      }
+      return { ...state, edits: { ...state.edits, [action.id]: { ...state.edits[action.id], ...patch } } }
+    }
+    case 'DELETE_PLAYER': {
+      const customPlayers = state.customPlayers.filter((c) => c.id !== action.id)
+      const importedPlayers = state.importedPlayers
+        ? state.importedPlayers.filter((c) => c.id !== action.id)
+        : state.importedPlayers
+      const statuses = { ...state.statuses }
+      delete statuses[action.id]
+      const edits = { ...state.edits }
+      delete edits[action.id]
+      return {
+        ...state,
+        customPlayers,
+        importedPlayers,
+        statuses,
+        edits,
+        events: state.events.filter((id) => id !== action.id),
+      }
+    }
+    case 'IMPORT_REPLACE': {
+      const importedPlayers = normalizePlayers(action.list)
+      // Seed statuses from the imported file for anything not already tracked.
+      const statuses = { ...state.statuses }
+      for (const p of importedPlayers) {
+        if (p.seedStatus && p.seedStatus !== 'available' && !statuses[p.id]) statuses[p.id] = p.seedStatus
+      }
+      return { ...state, importedPlayers, customPlayers: [], edits: {}, statuses }
+    }
+    case 'IMPORT_MERGE': {
+      const incoming = normalizePlayers(action.list)
+      const existing = new Map(
+        [...(state.importedPlayers && state.importedPlayers.length ? state.importedPlayers : state.players),
+        ...state.customPlayers].map((p) => [p.name.toLowerCase(), p])
+      )
+      const taken = takenIds(state)
+      const additions = []
+      const edits = { ...state.edits }
+      for (const p of incoming) {
+        const match = existing.get(p.name.toLowerCase())
+        if (match) {
+          // Update evaluation fields on the matched player.
+          edits[match.id] = {
+            ...edits[match.id],
+            juice: p.juice,
+            role: p.role,
+            trend: p.trend,
+            draftWindow: p.draftWindow,
+            points2025: p.points2025,
+            why: p.why,
+            bye: p.bye,
+            team: p.team,
+            position: p.position,
+          }
+        } else {
+          p.id = uniqueId(slugify(p.name) || 'player', taken)
+          taken.add(p.id)
+          additions.push(p)
+        }
+      }
+      return { ...state, customPlayers: [...state.customPlayers, ...additions], edits }
+    }
+    case 'CLEAR_DATA':
+      // Reset imported/custom players and all edits back to the baked-in file.
+      return {
+        ...state,
+        importedPlayers: null,
+        customPlayers: [],
+        edits: {},
+        heartsOverride: {},
+        notesOverride: {},
+      }
 
     default:
       return state
