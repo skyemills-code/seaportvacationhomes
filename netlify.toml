@@ -1,0 +1,16 @@
+# Netlify configuration for Wine Bar on the River — "Let's Keep in Touch"
+# This is a plain static site (no build step). Netlify serves the files as-is
+# and automatically detects the form in index.html.
+
+[build]
+  publish = "."
+  command = ""
+
+# Security headers. No analytics or tracking is used anywhere on this site.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "no-referrer"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"

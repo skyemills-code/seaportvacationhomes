@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Let's Keep in Touch &middot; Wine Bar on the River</title>
+  <meta name="description" content="Join our list to receive event invitations and news about new wine selections at Wine Bar on the River." />
+  <!-- No analytics, no cookies, no third-party tracking. -->
+  <style>
+    :root {
+      --burgundy: #6e2733;
+      --burgundy-bright: #8b3a48;
+      --gold: #b08d57;
+      --cream: #faf7f2;
+      --card: #ffffff;
+      --ink: #2e2a28;
+      --muted: #6b5d57;
+      --line: #e5ddd3;
+      --focus: #8b3a48;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
+      font-size: 20px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--burgundy-bright); }
+
+    .wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 22px;
+    }
+
+    /* ---------- Header / hero ---------- */
+    header {
+      text-align: center;
+      padding: 54px 22px 26px;
+    }
+
+    .eyebrow {
+      font-size: 15px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 18px;
+    }
+
+    .wordmark {
+      font-size: clamp(30px, 7vw, 46px);
+      line-height: 1.15;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--burgundy);
+      margin: 0;
+      font-weight: normal;
+    }
+    .wordmark em {
+      font-style: italic;
+      text-transform: lowercase;
+      color: var(--burgundy-bright);
+      padding: 0 0.08em;
+    }
+
+    .rule {
+      width: 90px;
+      height: 2px;
+      background: var(--gold);
+      border: 0;
+      margin: 28px auto;
+    }
+
+    .headline {
+      font-size: clamp(26px, 6vw, 38px);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 0 0 14px;
+      font-weight: normal;
+    }
+
+    .intro {
+      font-size: 21px;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* ---------- Card / form ---------- */
+    main { padding-bottom: 40px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 34px 30px 38px;
+      margin: 34px auto 0;
+      box-shadow: 0 10px 30px rgba(110, 39, 51, 0.06);
+    }
+
+    .field { margin-bottom: 26px; }
+
+    label {
+      display: block;
+      font-size: 19px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: var(--ink);
+    }
+    label .opt {
+      font-weight: normal;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      font-family: inherit;
+      font-size: 20px;
+      color: var(--ink);
+      background: #fff;
+      padding: 16px 16px;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--focus);
+      box-shadow: 0 0 0 3px rgba(139, 58, 72, 0.18);
+    }
+
+    /* Checkboxes — large, easy to tap */
+    .prefs-title { font-size: 19px; font-weight: bold; margin-bottom: 14px; }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 10px;
+      padding: 15px 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .check:hover { border-color: var(--gold); }
+    .check input {
+      width: 26px;
+      height: 26px;
+      accent-color: var(--burgundy);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check span { font-size: 19px; }
+
+    button {
+      width: 100%;
+      font-family: inherit;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: var(--burgundy);
+      border: 0;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-top: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    button:hover { background: var(--burgundy-bright); }
+    button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+    .privacy {
+      text-align: center;
+      font-size: 16px;
+      color: var(--muted);
+      margin: 18px auto 0;
+      max-width: 520px;
+    }
+
+    /* Honeypot — hidden from people, visible to bots */
+    .hp { position: absolute; left: -9999px; }
+
+    /* ---------- Secondary links ---------- */
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin: 40px auto 0;
+    }
+    .btn-secondary {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 19px;
+      letter-spacing: 0.03em;
+      color: var(--burgundy);
+      background: #fff;
+      border: 2px solid var(--burgundy);
+      border-radius: 10px;
+      padding: 14px 26px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .btn-secondary:hover { background: var(--burgundy); color: #fff; }
+
+    /* ---------- Footer ---------- */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+      padding: 44px 22px 54px;
+    }
+    footer .family { margin-top: 10px; font-size: 15px; }
+
+    @media (max-width: 480px) {
+      body { font-size: 19px; }
+      .card { padding: 26px 20px 30px; border-radius: 12px; }
+      header { padding-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">Wine Bar on the River</p>
+    <h1 class="wordmark">Wine Bar <em>on</em> the River</h1>
+    <hr class="rule" />
+    <h2 class="headline">Let's Keep in Touch</h2>
+    <p class="intro">
+      Join our list to receive invitations to our events and to hear about new
+      wines as they arrive. Just a note now and then &mdash; never any spam.
+    </p>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="card">
+        <!--
+          Netlify Forms:
+          - data-netlify="true" tells Netlify to capture submissions.
+          - The hidden "form-name" input must match the form's name.
+          - netlify-honeypot adds invisible spam protection.
+          - action="/success.html" shows the thank-you page after submitting.
+        -->
+        <form
+          name="keep-in-touch"
+          method="POST"
+          action="/success.html"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+        >
+          <input type="hidden" name="form-name" value="keep-in-touch" />
+
+          <p class="hp">
+            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+          </p>
+
+          <div class="field">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" autocomplete="name" required />
+          </div>
+
+          <div class="field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" autocomplete="email" required />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone Number <span class="opt">(optional)</span></label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" />
+          </div>
+
+          <div class="field">
+            <p class="prefs-title">I'd like to hear about:</p>
+            <label class="check">
+              <input type="checkbox" name="interests" value="Event invitations" checked />
+              <span>Event invitations</span>
+            </label>
+            <label class="check">
+              <input type="checkbox" name="interests" value="New wine selections &amp; tastings" checked />
+              <span>New wine selections &amp; tastings</span>
+            </label>
+          </div>
+
+          <button type="submit">Keep Me in Touch</button>
+
+          <p class="privacy">
+            We'll only use your information to share event invitations and wine
+            news. No tracking, no third parties &mdash; ever.
+          </p>
+        </form>
+      </div>
+
+      <div class="links">
+        <a class="btn-secondary" href="/menu.pdf" target="_blank" rel="noopener">View Our Wine Menu</a>
+        <a class="btn-secondary" href="https://www.instagram.com/winebar_ontheriver/" target="_blank" rel="noopener">Follow Us on Instagram</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>Wine Bar on the River &mdash; thoughtfully selected wines, genuine hospitality.</p>
+    <p class="family">Proudly part of a family of locally owned establishments:<br />
+      Rusty Rudder's Tap House &middot; The Brass Coyote &middot; The Whiskey</p>
+  </footer>
+</body>
+</html>

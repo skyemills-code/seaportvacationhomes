@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thank You &middot; Wine Bar on the River</title>
+  <meta name="description" content="Thank you for joining the Wine Bar on the River list." />
+  <style>
+    :root {
+      --burgundy: #6e2733;
+      --burgundy-bright: #8b3a48;
+      --gold: #b08d57;
+      --cream: #faf7f2;
+      --ink: #2e2a28;
+      --muted: #6b5d57;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif;
+      font-size: 20px;
+      line-height: 1.65;
+      text-align: center;
+      padding: 40px 22px;
+    }
+    .box { max-width: 560px; }
+    .eyebrow {
+      font-size: 15px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin: 0 0 20px;
+    }
+    h1 {
+      font-size: clamp(30px, 7vw, 44px);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--burgundy);
+      font-weight: normal;
+      margin: 0 0 20px;
+    }
+    p { font-size: 21px; color: var(--muted); margin: 0 auto 16px; max-width: 480px; }
+    hr { width: 90px; height: 2px; background: var(--gold); border: 0; margin: 30px auto; }
+    .links { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: 30px; }
+    a.btn {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 19px;
+      color: var(--burgundy);
+      background: #fff;
+      border: 2px solid var(--burgundy);
+      border-radius: 10px;
+      padding: 14px 26px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    a.btn:hover { background: var(--burgundy); color: #fff; }
+    a.plain { color: var(--burgundy-bright); }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <p class="eyebrow">Wine Bar on the River</p>
+    <h1>Thank You</h1>
+    <hr />
+    <p>You're on the list. We'll be in touch with invitations to our events and
+       news about the wines we're pouring.</p>
+    <p>Cheers &mdash; and we hope to see you soon.</p>
+    <div class="links">
+      <a class="btn" href="/menu.pdf" target="_blank" rel="noopener">View Our Wine Menu</a>
+      <a class="btn" href="https://www.instagram.com/winebar_ontheriver/" target="_blank" rel="noopener">Follow Us on Instagram</a>
+    </div>
+    <p style="margin-top:30px;font-size:17px;"><a class="plain" href="/">&larr; Back to the form</a></p>
+  </div>
+</body>
+</html>
